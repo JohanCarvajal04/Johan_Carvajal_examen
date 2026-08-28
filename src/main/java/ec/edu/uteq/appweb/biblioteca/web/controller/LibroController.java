@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ec.edu.uteq.appweb.biblioteca.domain.Autor;
 import ec.edu.uteq.appweb.biblioteca.domain.Libro;
+import ec.edu.uteq.appweb.biblioteca.integration.OpenLibraryClient;
 import ec.edu.uteq.appweb.biblioteca.service.LibroService;
 import ec.edu.uteq.appweb.biblioteca.web.dto.ApiResponse;
 import ec.edu.uteq.appweb.biblioteca.web.dto.AutorRequest;
@@ -45,6 +46,7 @@ public class LibroController {
     // TODO-U4-1: inyectar LibroService, LibroMapper y OpenLibraryClient, e implementar los endpoints.
     private final LibroService servicio;
     private final LibroMapper mapper;
+    private final OpenLibraryClient open;
 
     public LibroController(LibroService libroService, LibroMapper libroMapper){
         this.servicio = libroService;
@@ -87,5 +89,11 @@ public class LibroController {
                 .body(ApiResponse.ok(cuerpo,"Libro desactivado"));
     }
 
+    @GetMapping("/{id}/enriquecido")
+    public ApiResponse<List<LibroResponse>> ListaEnriquecida (@PageableDefault(size= 20 ) Pageable paginacion,@PathVariable Sting isbn){
+        Page<Libro> pagina = open.consultarPorIsbn(isbn);
+        List<LibroResponse> datos = pagina.getContent().stream().map(mapper::aRespuesta).toList();
+        return ApiResponse.ok(datos, "Libros listados", PageMeta.de(pagina));
+    }
 
 }
