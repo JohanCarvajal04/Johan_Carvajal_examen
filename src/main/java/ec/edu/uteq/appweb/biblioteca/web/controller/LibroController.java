@@ -1,5 +1,6 @@
 package ec.edu.uteq.appweb.biblioteca.web.controller;
 
+import java.net.ResponseCache;
 import java.net.URI;
 import java.util.List;
 
@@ -80,7 +81,10 @@ public class LibroController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<LibroResponse>> desactivar(@Valid @PathVariable Long id){
-
+        Libro desactivar = servicio.desactivar(id);
+        LibroResponse cuerpo=mapper.aRespuesta(desactivar);
+        return ResponseEntity
+                .body(ApiResponse.ok(cuerpo,"Libro desactivado"));
     }
 
 
