@@ -1,7 +1,14 @@
 package ec.edu.uteq.appweb.biblioteca.integration;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+
+import ec.edu.uteq.appweb.biblioteca.config.CacheConfig;
+import ec.edu.uteq.appweb.biblioteca.exception.ServicioExternoException;
 
 /**
  * ============================================================================
@@ -42,7 +49,19 @@ public class OpenLibraryClient {
         this.restClient = restClientExterno;
     }
 
+    @Cacheable(cacheNames = CacheConfig.CACHE_OPENLIBRARY, key = "#isbn", unless = "#result == null")
     public OpenLibraryResponse consultarPorIsbn(String isbn) {
-        throw new UnsupportedOperationException("TODO-U4-4: consumir Open Library con cache y manejo de errores");
+        try {
+            return restClient.get()
+                    .uri("/isbn/{isbn}.json", isbn)
+                    .retrieve()
+                    .body(OpenLibraryResponse.class);
+        } catch (HttpClientErrorException.NotFound ex) {
+            return null;
+        } catch (HttpClientErrorException | HttpServerErrorException ex) {
+            throw new ServicioExternoException("Open Library respondio con error: " + ex.getStatusCode(), ex);
+        } catch (ResourceAccessException ex) {
+            throw new ServicioExternoException("Open Library no respondio a tiempo", ex);
+        }
     }
 }

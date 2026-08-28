@@ -5,29 +5,22 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * ============================================================================
- * TODO-U4-2: FILTRO QUE AUTENTICA CADA PETICION A PARTIR DEL JWT
- * ============================================================================
- *
- * Debe, en este orden:
- *   1. Leer el token de la cabecera Authorization: Bearer &lt;token&gt;
- *      (opcionalmente tambien de una cookie HttpOnly llamada access_token).
- *   2. Si no hay token, dejar pasar la peticion sin autenticar: el filtro NO
- *      rechaza, de eso se encarga la cadena de seguridad.
- *   3. Si hay token y es valido, construir un UsernamePasswordAuthenticationToken
- *      con las autoridades derivadas del claim rol, prefijadas con "ROLE_",
- *      y colocarlo en el SecurityContextHolder.
- *   4. Si el token es invalido o expiro, limpiar el contexto y continuar.
- *
- * Cuidado con un error frecuente: si escribe la respuesta de error aqui dentro,
- * se rompe el contrato de ProblemDetail que ya implementa GlobalExceptionHandler.
+ * TODO-U4-2: autentica cada peticion a partir del JWT de la cabecera
+ * Authorization. No rechaza nada por si mismo: eso lo decide SecurityConfig.
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final String PREFIJO = "Bearer ";
 
     private final JwtService jwtService;
 
@@ -39,7 +32,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest peticion,
                                     HttpServletResponse respuesta,
                                     FilterChain cadena) throws ServletException, IOException {
-        // TODO-U4-2: implementar la extraccion y validacion del token.
+        String token = extraerToken(peticion);
+
+        if (token != null) {
+            try {
+                if (jwtService.esValido(token)) {
+                    String username = jwtService.extraerUsername(token);
+                    String rol = jwtService.extraerRol(token);
+                    var autenticacion = new UsernamePasswordAuthenticationToken(
+                            username, null, List.of(new SimpleGrantedAuthority("ROLE_" + rol)));
+                    SecurityContextHolder.getContext().setAuthentication(autenticacion);
+                } else {
+                    SecurityContextHolder.clearContext();
+                }
+            } catch (Exception ex) {
+                SecurityContextHolder.clearContext();
+            }
+        }
+
         cadena.doFilter(peticion, respuesta);
+    }
+
+    private String extraerToken(HttpServletRequest peticion) {
+        String cabecera = peticion.getHeader("Authorization");
+        if (cabecera != null && cabecera.startsWith(PREFIJO)) {
+            return cabecera.substring(PREFIJO.length());
+        }
+        jakarta.servlet.http.Cookie[] cookies = peticion.getCookies();
+        if (cookies != null) {
+            for (jakarta.servlet.http.Cookie cookie : cookies) {
+                if ("access_token".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 }

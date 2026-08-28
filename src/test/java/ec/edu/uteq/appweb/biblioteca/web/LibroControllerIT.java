@@ -1,46 +1,66 @@
 package ec.edu.uteq.appweb.biblioteca.web;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import ec.edu.uteq.appweb.biblioteca.BaseIntegracionTest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
 /**
- * ============================================================================
- * TODO-U4-5: PRUEBAS DE INTEGRACION (minimo 10 en total en el proyecto)
- * ============================================================================
- *
- * Quite la anotacion @Disabled a medida que implemente cada caso. La Guia PE-U4
- * exige un minimo de diez pruebas de feature o integracion pasando sin fallos,
- * y pide la captura del resultado de la ejecucion dentro del informe.
- *
- * Casos minimos sugeridos, alineados con la rubrica:
- *   1. Login con credenciales correctas devuelve 200 y un token.
- *   2. Login con credenciales invalidas devuelve 401.
- *   3. GET /api/v1/libros sin token devuelve 401.
- *   4. GET /api/v1/libros con rol LECTOR devuelve 200 y trae meta.
- *   5. POST /api/v1/libros con rol LECTOR devuelve 403.
- *   6. POST /api/v1/libros con rol ADMIN y cuerpo valido devuelve 201 con Location.
- *   7. GET /api/v1/libros/{id} inexistente devuelve 404 con ProblemDetail.
- *   8. POST /api/v1/libros con cuerpo invalido devuelve 400 y el arreglo errors poblado.
- *   9. POST /api/v1/prestamos a un socio con tres prestamos activos devuelve 409.
- *  10. Toda respuesta exitosa trae el envoltorio {success, data, message, errors, meta}.
- *
- * Ejecute con:  mvn test
+ * Pruebas de integracion de LibroController, siguiendo el patron de
+ * AutorControllerIT.
  */
 class LibroControllerIT extends BaseIntegracionTest {
 
+    @Autowired
+    private MockMvc mockMvc;
+
     @Test
-    @Disabled("TODO-U4-5: implementar")
     @DisplayName("GET /api/v1/libros responde 200 con envoltorio y metadatos de paginacion")
-    void listarLibrosDevuelveEnvoltorio() {
-        throw new UnsupportedOperationException("TODO-U4-5");
+    void listarLibrosDevuelveEnvoltorio() throws Exception {
+        mockMvc.perform(get("/api/v1/libros").param("size", "5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.meta.page").value(0))
+                .andExpect(jsonPath("$.meta.size").value(5));
     }
 
     @Test
-    @Disabled("TODO-U4-5: implementar")
-    @DisplayName("POST /api/v1/libros con rol LECTOR responde 403")
-    void crearLibroConRolLectorDevuelveProhibido() {
-        throw new UnsupportedOperationException("TODO-U4-5");
+    @DisplayName("GET /api/v1/libros/999999 responde 404 en formato Problem Details")
+    void buscarLibroInexistenteDevuelveProblemDetail() throws Exception {
+        mockMvc.perform(get("/api/v1/libros/999999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.title").exists())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.detail").exists());
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/libros con titulo vacio responde 400 con el arreglo errors poblado")
+    void crearLibroConTituloVacioDevuelve400() throws Exception {
+        mockMvc.perform(post("/api/v1/libros")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "isbn": "1234567890",
+                                  "titulo": "",
+                                  "anioPublicacion": 2020,
+                                  "ejemplaresTotales": 1,
+                                  "autorId": 1,
+                                  "editorialId": 1,
+                                  "categoriaId": 1
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").isNotEmpty());
     }
 }

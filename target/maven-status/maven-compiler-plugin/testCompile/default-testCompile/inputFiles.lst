@@ -1,0 +1,5 @@
+/build/src/test/java/ec/edu/uteq/appweb/biblioteca/BaseIntegracionTest.java
+/build/src/test/java/ec/edu/uteq/appweb/biblioteca/BibliotecaApplicationTests.java
+/build/src/test/java/ec/edu/uteq/appweb/biblioteca/repository/LibroRepositoryTest.java
+/build/src/test/java/ec/edu/uteq/appweb/biblioteca/web/AutorControllerIT.java
+/build/src/test/java/ec/edu/uteq/appweb/biblioteca/web/LibroControllerIT.java

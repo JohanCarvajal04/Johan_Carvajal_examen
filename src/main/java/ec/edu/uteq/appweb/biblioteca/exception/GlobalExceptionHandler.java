@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -34,6 +35,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServicioExternoException.class)
     public ProblemDetail servicioExterno(ServicioExternoException ex) {
         return construir(HttpStatus.BAD_GATEWAY, "Servicio externo no disponible", ex.getMessage(), "servicio-externo");
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail noAutenticado(AuthenticationException ex) {
+        return construir(HttpStatus.UNAUTHORIZED, "No autenticado", ex.getMessage(), "no-autenticado");
     }
 
     @ExceptionHandler(AccessDeniedException.class)

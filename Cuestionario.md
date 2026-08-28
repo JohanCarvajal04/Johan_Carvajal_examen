@@ -25,20 +25,27 @@
 **a) Enuncie las seis restricciones del estilo arquitectónico REST según Fielding. (3 puntos)**
 
 **Respuesta:**
-
-
+1. Cliente-Servidor: la cual se encarga de dividir la interfaz en cliente y lo que seria el backend el servidor
+2. stateless o restriccion sin estado: la cual es que cada peticion http debe contener informacion necesaria para que la procese el servidor
+3. cacheable: tiene que poder ser almacenadas en cache 
+4. estructura en capas: ya que el cliente no requiere saber si se comunica con un servidor o varios
+5. interfaz uniforme: que se use los metodos http estandar como get,post,put,delete
+6. codigo: de forma opcional creo que el servidor puede enviar código ejecutable al cliente, por ejemplo JavaScript.
 
 
 **b) El proyecto base expone `GET /api/v1/autores` y guarda el estado de la sesión del usuario solo en el JWT que el cliente envía en cada petición. Explique qué restricción concreta se está cumpliendo con esa decisión y qué consecuencia práctica tiene para escalar el sistema a varios servidores detrás de un balanceador. (3 puntos)**
 
 **Respuesta:**
 
+Se está cumpliendo la restricción sin estado (stateless). El servidor no guarda la sesión del usuario, toda la información necesaria creo que se encuentra en el JWT para autenticarlo en cada peticion.
+
+Como consecuencia, el sistema puede escalar más fácilmente a varios servidores detrás de un balanceador de carga, porque cualquier servidor puede procesar la petición sin necesitar acceder a una sesión almacenada en otro servidor.
 
 
 **c) De las seis restricciones, indique cuál es opcional y dé un ejemplo real de una API que la use. (2 puntos)**
 
 **Respuesta:**
-
+Creo que es el codigo por que al no ser siempre necesario se lo puede considerar opcional.
 
 
 ---
@@ -65,8 +72,8 @@ Firmar creo que era simplemente el token tiene una clave única con el cual se v
 
 **Respuesta:**
 
-La primera seria revocarlo de manera manual de token para que se pueda invalidar
-
+Usar lo que seria las blacklist pero seria una desventaja ya que requiere consultar una base de datos o caché, por lo que se pierde parcialmente la ventaja de que JWT sea completamente stateless.
+la otra seria usar tokens de menor duracion pero esto haria administrar los refresh tokens, aumentando la complejidad del sistema.
 
 
 ---
@@ -79,17 +86,20 @@ La primera seria revocarlo de manera manual de token para que se pueda invalidar
 
 | Criterio | SOAP | REST |
 |---|---|---|
-| Formato del mensaje | | |
-| Contrato de descripción | | |
-| Sobrecarga de serialización | | |
-| Tipado | | |
-| Facilidad de consumo desde un cliente móvil | | |
-| Manejo de errores | | |
+| Formato del mensaje | principalmente XML | puede ser XML, json y otros|
+| Contrato de descripción | utilizar WSDL | no requiere contrato creo |
+| Sobrecarga de serialización | mayor por el uso de XML y la estructura de SOAP | menor, especialmente usando Json |
+| Tipado | seria mas formal | mas flexible |
+| Facilidad de consumo desde un cliente móvil | mas complejo y pesado | mas sencillo y ligero |
+| Manejo de errores |  | utiliza codigos http |
 
 **b) El Servicio de Rentas Internas del Ecuador expone la autorización de comprobantes electrónicos mediante servicios SOAP. Explique dos razones técnicas por las que una institución de ese tipo mantiene SOAP en lugar de migrar a REST. (3 puntos)**
 
 **Respuesta:**
 
+1. Contratos estrictos y compatibilidad: SOAP utiliza WSDL, que define de forma formal las operaciones, tipos de datos y mensajes. Esto facilita la integración entre múltiples sistemas empresariales y permite mantener compatibilidad con sistemas existentes.
+
+2. Ecosistema empresarial y seguridad: SOAP cuenta con estándares como WS-Security y otros mecanismos diseñados para integraciones empresariales complejas. Además, migrar un servicio utilizado por muchos contribuyentes y sistemas podría romper integraciones existentes y generar altos costos de migración.
 
 
 ---
@@ -117,6 +127,9 @@ Una ves que llega la petición se ingresa en el TTL, después se desabilita que 
 
 **Respuesta:**
 
+No se debe almacenar en caché una respuesta de error porque el fallo puede ser temporal. Si se guardara, el sistema seguiría devolviendo el error incluso después de que el servicio externo se haya recuperado.
+
+Esto podría provocar que los usuarios continúen recibiendo una respuesta incorrecta durante todo el tiempo de vida del caché, aunque el servicio ya funcione correctamente.
 
 
 ---
@@ -130,8 +143,8 @@ Para cada escenario indique el código HTTP correcto y explique en una línea po
 | # | Escenario | Código | Justificación (una línea) |
 |---|---|---|---|
 | a | `GET /api/v1/libros/999999` y ese identificador no existe | 404 | sale un error por no encuentra ningun libro con ese identificador |
-| b | `POST /api/v1/libros` sin cabecera `Authorization` | 403 | no tiene la autorizacion para acceder a ese endpoint |
-| c | Usuario autenticado con rol `LECTOR` envía `POST /api/v1/libros` | 401 | problema de autinticacion por el rol, lo cual no le da acceso al endpoint|
+| b | `POST /api/v1/libros` sin cabecera `Authorization` | 401 | no tiene la autorizacion para acceder a ese endpoint |
+| c | Usuario autenticado con rol `LECTOR` envía `POST /api/v1/libros` | 403 | problema de autinticacion por el rol, lo cual no le da acceso al endpoint|
 | d | `POST /api/v1/libros` con el campo `titulo` vacío | | |
 | e | Prestar un libro a un socio que ya tiene tres préstamos activos | | |
 | f | La API de Open Library no responde dentro del *timeout* configurado | | |

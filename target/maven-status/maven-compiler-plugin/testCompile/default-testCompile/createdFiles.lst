@@ -1,0 +1,5 @@
+ec/edu/uteq/appweb/biblioteca/BaseIntegracionTest.class
+ec/edu/uteq/appweb/biblioteca/repository/LibroRepositoryTest.class
+ec/edu/uteq/appweb/biblioteca/web/AutorControllerIT.class
+ec/edu/uteq/appweb/biblioteca/BibliotecaApplicationTests.class
+ec/edu/uteq/appweb/biblioteca/web/LibroControllerIT.class
