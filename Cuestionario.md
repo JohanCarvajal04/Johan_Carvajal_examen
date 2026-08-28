@@ -12,10 +12,10 @@
 
 | Campo | Valor |
 |---|---|
-| Apellidos y nombres | |
-| Número de carnet | |
-| Correo institucional | |
-| Fecha | |
+| Apellidos y nombres | Carvajal Loor Johan Stalin |
+| Número de carnet | 1207452903 |
+| Correo institucional | jcarvajall@uteq.edu.ec |
+| Fecha | 28/08/2026 |
 | URL del repositorio | |
 
 ---
@@ -25,6 +25,7 @@
 **a) Enuncie las seis restricciones del estilo arquitectónico REST según Fielding. (3 puntos)**
 
 **Respuesta:**
+
 
 
 
@@ -48,17 +49,23 @@
 
 **Respuesta:**
 
+Las partes del JWT serian cabecera, cuerpo y firma.
+la cabecera tiene la información del token, el cuerpo la información de la sesión y la firma es un identificador del token.
 
 
 **b) Un compañero afirma: «como el JWT va firmado, puedo guardar en el *payload* la contraseña del usuario sin riesgo». Explique por qué está equivocado, precisando la diferencia entre firmar y cifrar. (2 puntos)**
 
 **Respuesta:**
 
+Firmar creo que era simplemente el token tiene una clave única con el cual se va a identificar, mientras que cifrar toda la información tanto de la sesión como la de token será enviada codificada haciendo asi que no tengan acceso a la información que tiene el token. Por lo tanto no es recomendable guardar la contraseña cuando el token solo va firmado.
+
 
 
 **c) El JWT es *stateless* por diseño, lo que genera un problema conocido: no se puede invalidar un token antes de que expire. Describa dos estrategias distintas para revocarlo y señale la desventaja de cada una. (3 puntos)**
 
 **Respuesta:**
+
+La primera seria revocarlo de manera manual de token para que se pueda invalidar
 
 
 
