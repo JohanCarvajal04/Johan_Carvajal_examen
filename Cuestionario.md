@@ -126,9 +126,9 @@ Para cada escenario indique el código HTTP correcto y explique en una línea po
 
 | # | Escenario | Código | Justificación (una línea) |
 |---|---|---|---|
-| a | `GET /api/v1/libros/999999` y ese identificador no existe | | |
-| b | `POST /api/v1/libros` sin cabecera `Authorization` | | |
-| c | Usuario autenticado con rol `LECTOR` envía `POST /api/v1/libros` | | |
+| a | `GET /api/v1/libros/999999` y ese identificador no existe | 404 | sale un error por no encuentra ningun libro con ese identificador |
+| b | `POST /api/v1/libros` sin cabecera `Authorization` | 403 | no tiene la autorizacion para acceder a ese endpoint |
+| c | Usuario autenticado con rol `LECTOR` envía `POST /api/v1/libros` | 401 | problema de autinticacion por el rol, lo cual no le da acceso al endpoint|
 | d | `POST /api/v1/libros` con el campo `titulo` vacío | | |
 | e | Prestar un libro a un socio que ya tiene tres préstamos activos | | |
 | f | La API de Open Library no responde dentro del *timeout* configurado | | |
@@ -145,6 +145,6 @@ Para cada escenario indique el código HTTP correcto y explique en una línea po
 
 Marque con una `x` y complete:
 
-- [ ] Declaro que estas respuestas son de mi autoría, redactadas durante la sesión de examen, sin asistencia de inteligencia artificial ni comunicación con terceros.
+- [ x ] Declaro que estas respuestas son de mi autoría, redactadas durante la sesión de examen, sin asistencia de inteligencia artificial ni comunicación con terceros.
 
-Firma (nombre completo): ______________________________
+Firma (nombre completo): Johan Stalin Carvajal Loor
