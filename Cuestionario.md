@@ -102,13 +102,16 @@ La primera seria revocarlo de manera manual de token para que se pueda invalidar
 
 **Respuesta:**
 
+Una ves que llega la petición se ingresa en el TTL, después se desabilita que tenga valores nulos, después se la da una llave serializable y por ultimo se le da un valor a esa llave serial y se envia la respuesta del cache.
+
 
 
 **b) Justifique técnicamente por qué el TTL de `openlibrary` es doce veces mayor que el de `libros`, y qué criterio general debe guiar la elección de un TTL. (3 puntos)**
 
 **Respuesta:**
 
-
+ Porque El namespace "libros" tiene un TTL corto porque el catalogo cambia con frecuencia.
+ El namespace "openlibrary" tiene TTL de 24 horas porque los metadatos bibliograficos de un ISBN son practicamente inmutables: se usa en el TODO-U4-4.
 
 **c) Explique por qué nunca debe almacenarse en caché la respuesta de un fallo del servicio externo, y describa qué le ocurriría al sistema si se hiciera. (2 puntos)**
 

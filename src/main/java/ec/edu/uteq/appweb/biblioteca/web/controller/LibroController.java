@@ -3,6 +3,9 @@ package ec.edu.uteq.appweb.biblioteca.web.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ec.edu.uteq.appweb.biblioteca.service.LibroService;
+import ec.edu.uteq.appweb.biblioteca.web.mapper.LibroMapper;
+
 /**
  * ============================================================================
  * TODO-U4-1 (Objetivo especifico 2 de la Guia): API REST DEL CATALOGO
@@ -28,4 +31,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class LibroController {
 
     // TODO-U4-1: inyectar LibroService, LibroMapper y OpenLibraryClient, e implementar los endpoints.
+    private final LibroService servicio;
+    private final LibroMapper mapper;
+
+    public LibroController(LibroService libroService, LibroMapper libroMapper){
+        this.servicio = libroService;
+        this.mapper = libroMapper;
+    }
+    @GetMapping
+    public ApiResponse<List<LibroResponse>> Listar (@PageableDefault(size= 20 ) Pageable paginacion){
+        Page<Libro> pagina = servicio.listarActivos(null)
+    }
+
+
 }
